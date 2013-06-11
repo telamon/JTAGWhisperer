@@ -20,9 +20,10 @@ You don't have pyserial installed. Please install it and try again.
 """
 
 total_bytes_sent = 0
+total_bytes_glob =0
 need_lf = False
 def send_xsvf_chunk(s, xsvf):
-  global total_bytes_sent, need_lf
+  global total_bytes_sent, need_lf, total_bytes_glob
   if len(xsvf) == 0:
     print 'Problem: tried to send empty xsvf.'
     return xsvf
@@ -34,7 +35,7 @@ def send_xsvf_chunk(s, xsvf):
     total_bytes_sent += bytes_written
     chunk = chunk[bytes_written:]
     bytes_to_write -= bytes_written
-  print '\rSent: %8d bytes, %8d remaining' % (total_bytes_sent, len(xsvf)),
+  print '\r%3i%% Sent: %8d bytes, %8d remaining' % ((total_bytes_sent/float(total_bytes_glob)*100),total_bytes_sent, len(xsvf)),
   need_lf = True
   sys.stdout.flush()
   return xsvf
@@ -52,14 +53,14 @@ def maybe_print_lf():
     print
 
 def program(xsvf_filename, port, bps):
-  global total_bytes_sent
+  global total_bytes_sent , total_bytes_glob  
   start_time = 0
 
   f = open(xsvf_filename, 'rb')
   xsvf = f.read()
   f.close()
   print 'Ready to send file of size %d bytes.' % (len(xsvf))
-
+  total_bytes_glob = len(xsvf)
   (xsvf_sum, xsvf_len) = get_xsvf_checksum(xsvf)
 
   s = serial.Serial(port=port, baudrate=bps, rtscts=True)

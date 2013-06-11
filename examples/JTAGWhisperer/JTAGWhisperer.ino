@@ -46,6 +46,7 @@ void do_it() {
       break;
     }
     ++instruction_count;
+	delay(4); // Tune this number if you stability issues
   }
   serial_comm.Important("Processed %d instructions.", instruction_count);
 }
